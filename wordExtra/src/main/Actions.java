@@ -7,6 +7,7 @@ import file.MyFile;
 
 import java.awt.*;
 import java.io.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -29,28 +30,37 @@ public class Actions {
         textArea.append("Extra fold : " + fold.toString() + "\n");
         //调用 多线程递归方法。
         //初始化线程池
-        ListDirRunable.es = new ThreadPoolExecutor(10, 20, 2, TimeUnit.MINUTES, new SynchronousQueue<>());
+        ListDirRunable.es = new ThreadPoolExecutor(20, 40, 2, TimeUnit.MINUTES, new LinkedBlockingQueue<>(),new ThreadPoolExecutor.DiscardPolicy());
+        ListDirRunable.count=0;
         FileFactory ff = file -> {
             if (filter(file.getName())) {
                 Extra.extra(readFile(file));
-                System.out.println(file);
+                System.out.println( ListDirRunable.es.getQueue().size()+"  "+file.getName());
             }
-            if(ListDirRunable.es.getTaskCount()==0 && ListDirRunable.es.getActiveCount()==0){
-                extraFoldEnd(textArea);
-            }
+
             return null;
         };
+
         ListDirRunable.ff = ff;
         ListDirRunable run = new ListDirRunable(fold);//创建任务
         ListDirRunable.es.submit(run); //提交任务
-    }
+
+        while(true)
+        if(ListDirRunable.es.getQueue().size()<=0 && ListDirRunable.es.getActiveCount()==1&&ListDirRunable.es.getCompletedTaskCount()>=1){
+            System.out.println("ListDirRunable.es.getQueue().size() = " + ListDirRunable.es.getQueue().size());
+            System.out.println("ListDirRunable.es.getActiveCount() = " + ListDirRunable.es.getActiveCount());
+            System.out.println("ListDirRunable.es.getTaskCount() = " + ListDirRunable.es.getTaskCount());
+            System.out.println("ListDirRunable.es.getCompletedTaskCount() = " + ListDirRunable.es.getCompletedTaskCount());
+            extraFoldEnd(textArea);
+            break;
+        }}
 
     static void extraFoldEnd(TextArea textArea) {
         //System.out.println("the count of extraed" + count);
         System.out.println("\nfileCount = " + ListDirRunable.count);
 
         textArea.append(Extra.s.toString() + "\n");
-        textArea.append("words count = " + Extra.s.size() + "\n");
+        textArea.append("words count = " + Extra.s.size() + "\n"); //TODO:并发修改异常。
         //textArea.append("file count = " + count + "\n\n\n");
 
         System.out.println("down");
