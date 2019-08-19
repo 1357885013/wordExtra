@@ -1,19 +1,14 @@
 package file;
 
-import extra.Extra;
+import util.ThreadPool;
 
 import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-
-import static file.MyFile.filter;
-import static file.MyFile.readFile;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ListDirRunable implements Runnable {
-    public static ThreadPoolExecutor es;
-    public static FileFactory ff ;
+    public static FileAction action;
     public static int count = 0;
+    public static ReentrantLock lock = new ReentrantLock();
     private File dir;
 
     public ListDirRunable(File dir) {
@@ -33,13 +28,23 @@ public class ListDirRunable implements Runnable {
         if (files != null && files.length > 0) {
             for (File file : files) {
                 if (file.isDirectory())
-                    es.submit(new ListDirRunable(file));
+                    ThreadPool.pool.submit(new ListDirRunable(file));
                 else if (file.isFile()) {
-                    count++;
+                    try {
+                        action.main(file);  //调用对文件的操作
+                        lock.lock();
+                        count++;
+                    } finally {
+                        lock.unlock();
+                    }
                     //System.out.println("\nfileCount = " + count);
-                    ff.main(file);
                 }
             }
         }
     }
 }
+
+//ListDirRunable.es.getTaskCount() = 3831
+//        ListDirRunable.es.getCompletedTaskCount() = 3830
+//        fileCount = 31498
+//        words count = 25639

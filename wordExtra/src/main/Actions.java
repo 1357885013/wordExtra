@@ -1,16 +1,12 @@
 package main;
 
 import extra.Extra;
-import file.FileFactory;
 import file.ListDirRunable;
 import file.MyFile;
+import util.ThreadPool;
 
 import java.awt.*;
 import java.io.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import static file.MyFile.filter;
 import static file.MyFile.readFile;
@@ -19,59 +15,68 @@ public class Actions {
     static void extraFile(TextArea textArea, FileDialog openDialog) {
         textArea.setRows(0);
         textArea.append(readFile(MyFile.selectFile(openDialog)) + "\n");
-        Extra.s.clear();
+        Extra.wordMeaningless.clear();
+        Extra.wordMeaningful.clear();
         Extra.extra(textArea.getText());
-        textArea.append(Extra.s.toString() + "\n");
+        textArea.append("无意义的词：" + Extra.wordMeaningless.toString() + "\n");
+        textArea.append("有意义的词：" + Extra.wordMeaningful.toString() + "\n");
     }
 
     static void extraFold(TextArea textArea) {
-        Extra.s.clear();
+        Extra.wordMeaningless.clear();
+        Extra.wordMeaningful.clear();
         java.io.File fold = MyFile.selectFold();
         textArea.append("Extra fold : " + fold.toString() + "\n");
         //调用 多线程递归方法。
         //初始化线程池
-        ListDirRunable.es = new ThreadPoolExecutor(20, 40, 2, TimeUnit.MINUTES, new LinkedBlockingQueue<>(),new ThreadPoolExecutor.DiscardPolicy());
-        ListDirRunable.count=0;
-        FileFactory ff = file -> {
+        ListDirRunable.count = 0;
+
+        ListDirRunable.action = file -> { //处理每一个文件的方法
             if (filter(file.getName())) {
                 Extra.extra(readFile(file));
-                System.out.println( ListDirRunable.es.getQueue().size()+"  "+file.getName());
+                System.out.println(ThreadPool.pool.getQueue().size() + "  " + file.getName());
             }
 
             return null;
         };
+        ThreadPool.pool.submit(new ListDirRunable(fold)); //创建提交任务
 
-        ListDirRunable.ff = ff;
-        ListDirRunable run = new ListDirRunable(fold);//创建任务
-        ListDirRunable.es.submit(run); //提交任务
+        while (true)  //死循环监视是否结束，目前还有问题
+            if (ThreadPool.pool.getQueue().size() <= 0 && ThreadPool.pool.getActiveCount() == 0 && ThreadPool.pool.getCompletedTaskCount() >= 1) {
+                extraFoldEnd(textArea);
+                textArea.append("有意义的：" + Extra.wordMeaningless.toString() + "\n");
+                textArea.append("无意义的：" + Extra.wordMeaningful.toString() + "\n");
+                System.out.println("完成");
+                break;
+            }
+    }
 
-        while(true)
-        if(ListDirRunable.es.getQueue().size()<=0 && ListDirRunable.es.getActiveCount()==1&&ListDirRunable.es.getCompletedTaskCount()>=1){
-            System.out.println("ListDirRunable.es.getQueue().size() = " + ListDirRunable.es.getQueue().size());
-            System.out.println("ListDirRunable.es.getActiveCount() = " + ListDirRunable.es.getActiveCount());
-            System.out.println("ListDirRunable.es.getTaskCount() = " + ListDirRunable.es.getTaskCount());
-            System.out.println("ListDirRunable.es.getCompletedTaskCount() = " + ListDirRunable.es.getCompletedTaskCount());
-            extraFoldEnd(textArea);
-            break;
-        }}
-
-    static void extraFoldEnd(TextArea textArea) {
+    static void extraFoldEnd(TextArea textArea) { //结束后输出信息
+        System.out.println("任务队列任务数 = " + ThreadPool.pool.getQueue().size());
+        System.out.println("正在执行任务的线程数 = " + ThreadPool.pool.getActiveCount());
+        System.out.println("总任务数量 = " + ThreadPool.pool.getTaskCount());
+        System.out.println("完成的任务数量 = " + ThreadPool.pool.getCompletedTaskCount());
         //System.out.println("the count of extraed" + count);
-        System.out.println("\nfileCount = " + ListDirRunable.count);
+        int count;
+        ListDirRunable.lock.lock();
+        count = ListDirRunable.count;
+        ListDirRunable.lock.unlock();
+        System.out.println("\n未过滤文件数 = " + count);
 
-        textArea.append(Extra.s.toString() + "\n");
-        textArea.append("words count = " + Extra.s.size() + "\n"); //TODO:并发修改异常。
+        //textArea.append(Extra.wordMeaningless.toString() + "\n");
+        textArea.append("提取出的单词数量：  有意义" + Extra.wordMeaningful.size() + "无意义" + Extra.wordMeaningless.size());
         //textArea.append("file count = " + count + "\n\n\n");
 
-        System.out.println("down");
     }
 
     static void extraText(TextArea textArea) {
         Extra extra = new Extra();
         textArea.setRows(0);
-        Extra.s.clear();
+        Extra.wordMeaningless.clear();
+        Extra.wordMeaningful.clear();
         Extra.extra(textArea.getText());
-        textArea.append(Extra.s.toString() + "\n");
+        textArea.append("有意义的：" + Extra.wordMeaningless.toString() + "\n");
+        textArea.append("无意义的：" + Extra.wordMeaningful.toString() + "\n");
     }
 
     static File saveFile(File file, TextArea textArea, FileDialog saveDialog) {

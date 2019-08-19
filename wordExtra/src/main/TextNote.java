@@ -1,18 +1,11 @@
 package main;
 
-import extra.Extra;
-import file.FileFactory;
-import file.MyFile;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
 
-import static file.MyFile.filter;
-import static file.MyFile.readFile;
 import static main.Actions.*;
 
 /**
@@ -36,19 +29,19 @@ public class TextNote {
     }
 
     private void init() {
-        frame = new Frame("word Exract");
+        frame = new Frame("记事本");
         frame.setBounds(300, 100, 800, 500);
         //frame.setLayout();
 
         MenuBar menuBar = new MenuBar();
-        Menu menu = new Menu("file");
+        Menu menu = new Menu("文件");
 
-        closeItem = new MenuItem("exit");
-        openItem = new MenuItem("open");
-        openFoldItem = new MenuItem("open fold");
-        saveItem = new MenuItem("save");
+        closeItem = new MenuItem("退出");
+        openItem = new MenuItem("打开文件");
+        openFoldItem = new MenuItem("打开目录");
+        saveItem = new MenuItem("保存");
 
-        Menu subMenu = new Menu("new");
+        Menu subMenu = new Menu("新建");
         subItem1 = new MenuItem("Web Project");
         subItem = new MenuItem("Java Project");
         subMenu.add(subItem);
@@ -109,7 +102,7 @@ public class TextNote {
         endExtra.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                extraFoldEnd(textArea);
             }
         });
 

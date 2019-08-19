@@ -2,6 +2,6 @@ package file;
 
 import java.io.File;
 
-public interface FileFactory {
+public interface FileAction {
     Object main(File file);
 }
