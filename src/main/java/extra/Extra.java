@@ -34,18 +34,20 @@ public class Extra {
                 ResultSet res = null;
                 try {
                     //p.getConnection().createArrayOf("String",new String[]{"123","123"});
-                    p.setString(1, word);
-                    int[] aaa = new int[] {1,2,3,44,5};
-                   //todo: p.setArray(1,new SerialArray(aaa));
-                    long timeBegin = System.nanoTime();
-                    res = p.executeQuery();//查询一次耗时40ms左右   加unique，btree索引后耗时0.075912ms
-                    System.out.println("6System.nanoTime()-timeBegin = " + ((System.nanoTime() - timeBegin) / 1000000F));
-                    if (res.next()) {
-                        wordMeaningful.add(word);
-                        System.out.println("useful  : " + word);
-                    } else {
-                        wordMeaningless.add(word);
-                        System.out.println("useless : " + word);
+                    if (!wordMeaningful.contains(word) && !wordMeaningless.contains(word)) {
+                        p.setString(1, word);
+                        int[] aaa = new int[]{1, 2, 3, 44, 5};
+                        //todo: p.setArray(1,new SerialArray(aaa));
+                        long timeBegin = System.nanoTime();
+                        res = p.executeQuery();//查询一次耗时40ms左右   加unique，btree索引后耗时0.075912ms
+                        System.out.println("6System.nanoTime()-timeBegin = " + ((System.nanoTime() - timeBegin) / 1000000F));
+                        if (res.next()) {
+                            wordMeaningful.add(word);
+                            System.out.println("useful  : " + word);
+                        } else {
+                            wordMeaningless.add(word);
+                            System.out.println("useless : " + word);
+                        }
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();

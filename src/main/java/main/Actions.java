@@ -44,8 +44,8 @@ public class Actions {
         while (true)  //死循环监视是否结束，目前还有问题
             if (ThreadPool.pool.getQueue().size() <= 0 && ThreadPool.pool.getActiveCount() == 0 && ThreadPool.pool.getCompletedTaskCount() >= 1) {
                 extraFoldEnd(textArea);
-                textArea.append("有意义的：" + Extra.wordMeaningless.toString() + "\n");
-                textArea.append("无意义的：" + Extra.wordMeaningful.toString() + "\n");
+                textArea.append("无意义的：" + Extra.wordMeaningless.toString() + "\n");
+                textArea.append("有意义的：" + Extra.wordMeaningful.toString() + "\n");
                 System.out.println("完成");
                 break;
             }
@@ -75,8 +75,8 @@ public class Actions {
         Extra.wordMeaningless.clear();
         Extra.wordMeaningful.clear();
         Extra.extra(textArea.getText());
-        textArea.append("有意义的：" + Extra.wordMeaningless.toString() + "\n");
-        textArea.append("无意义的：" + Extra.wordMeaningful.toString() + "\n");
+        textArea.append("无意义的：" + Extra.wordMeaningless.toString() + "\n");
+        textArea.append("有意义的：" + Extra.wordMeaningful.toString() + "\n");
     }
 
     static File saveFile(File file, TextArea textArea, FileDialog saveDialog) {
