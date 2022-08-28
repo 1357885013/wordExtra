@@ -29,19 +29,19 @@ public class TextNote {
     }
 
     private void init() {
-        frame = new Frame("记事本");
+        frame = new Frame("text note");
         frame.setBounds(300, 100, 800, 500);
         //frame.setLayout();
 
         MenuBar menuBar = new MenuBar();
-        Menu menu = new Menu("文件");
+        Menu menu = new Menu("file");
 
-        closeItem = new MenuItem("退出");
-        openItem = new MenuItem("打开文件");
-        openFoldItem = new MenuItem("打开目录");
-        saveItem = new MenuItem("保存");
+        closeItem = new MenuItem("exit");
+        openItem = new MenuItem("open file");
+        openFoldItem = new MenuItem("open directory");
+        saveItem = new MenuItem("save");
 
-        Menu subMenu = new Menu("新建");
+        Menu subMenu = new Menu("new");
         subItem1 = new MenuItem("Web Project");
         subItem = new MenuItem("Java Project");
         subMenu.add(subItem);

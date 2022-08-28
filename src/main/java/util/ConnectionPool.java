@@ -59,10 +59,10 @@ public class ConnectionPool {
     public static boolean addOne() {
         try {
             long timeBegin=System.nanoTime();
-            Connection con = DriverManager.getConnection("JDBC:Mysql://localhost:3306/word", "root", "root");
+            Connection con = DriverManager.getConnection("jdbc:mysql://rm-uf6bwql5a390jn46nvo.mysql.rds.aliyuncs.com:3306/word", "root", "");
             System.out.println("System.nanoTime()-timeBegin = " + ((System.nanoTime() - timeBegin)/1000000F));
             timeBegin=System.nanoTime();
-            PreparedStatement p = con.prepareStatement("select word from english_words where word = ?");
+            PreparedStatement p = con.prepareStatement("select word from good_words where word = ?");
             System.out.println("System.nanoTime()-timeBegin = " + ((System.nanoTime() - timeBegin)/1000000F));
             contents.put(p, true);
             lock.lock();

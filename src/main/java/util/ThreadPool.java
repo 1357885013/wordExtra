@@ -10,6 +10,5 @@ public class ThreadPool {
     public static ThreadPoolExecutor pool;
     static {
         pool = new ThreadPoolExecutor(20, 40, 2,TimeUnit.MINUTES, new LinkedBlockingQueue<>(), new ThreadPoolExecutor.DiscardPolicy());
-
     }
 }
